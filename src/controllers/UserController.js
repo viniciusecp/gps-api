@@ -35,7 +35,8 @@ function convertCoordinates(dados) {
     // date = new Date(date.getTime() - 360 * 60000); // CLOUD
 
     // latitude
-    if (latitudeDecimalDegrees.length == 9)
+    // if (latitudeDecimalDegrees.length == 9)
+     // por causa do rastreador que tava mandado 9 digitos de latitude, retirado if acima
       latitudeDecimalDegrees = "0" + latitudeDecimalDegrees;
     var g = parseFloat(latitudeDecimalDegrees.substring(0, 3));
     var d = parseFloat(latitudeDecimalDegrees.substring(3));
