@@ -36,8 +36,8 @@ function convertCoordinates(dados) {
 
     // latitude
     // if (latitudeDecimalDegrees.length == 9)
-     // por causa do rastreador que tava mandado 9 digitos de latitude, retirado if acima
-      latitudeDecimalDegrees = "0" + latitudeDecimalDegrees;
+    // por causa do rastreador que tava mandado 9 digitos de latitude, retirado if acima
+    latitudeDecimalDegrees = "0" + latitudeDecimalDegrees;
     var g = parseFloat(latitudeDecimalDegrees.substring(0, 3));
     var d = parseFloat(latitudeDecimalDegrees.substring(3));
     latitudeDecimalDegrees = g + d / 60;
@@ -122,6 +122,55 @@ module.exports = {
         where: { imei },
         limit: 10,
         order: [["id", "DESC"]]
+      });
+    } catch (err) {
+      console.log("Erro: " + err);
+      return res.json({ Erro: err });
+    }
+
+    const dadosFinais = convertCoordinates(response);
+    return res.json(dadosFinais);
+  },
+
+  async getHistory(req, res) {
+    var email = req.body.email;
+    var senha = req.body.senha;
+
+    var response = await userAuthentication(email, senha);
+    if (response.length <= 0)
+      return res.json({ Erro: "Usúario não autenticado" });
+
+    var imei = req.params.imei;
+    var dataInicio = req.body.dataInicio;
+    var horaInicio = req.body.horaInicio;
+    var dataFinal = req.body.dataFinal;
+    var horaFinal = req.body.horaFinal;
+
+    var dataInicioSql =
+      dataInicio.split("/")[2] +
+      "-" +
+      dataInicio.split("/")[1] +
+      "-" +
+      dataInicio.split("/")[0] +
+      " " +
+      horaInicio;
+    var dataFinalSql =
+      dataFinal.split("/")[2] +
+      "-" +
+      dataFinal.split("/")[1] +
+      "-" +
+      dataFinal.split("/")[0] +
+      " " +
+      horaFinal;
+
+    try {
+      response = await Gprmc.findAll({
+        where: {
+          imei,
+          date: { [db.Sequelize.Op.between]: [dataInicioSql, dataFinalSql] }
+        },
+        // limit: 30,
+        order: [["id", "ASC"]]
       });
     } catch (err) {
       console.log("Erro: " + err);
