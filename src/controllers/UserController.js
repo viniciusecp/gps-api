@@ -146,22 +146,24 @@ module.exports = {
     var dataFinal = req.body.dataFinal;
     var horaFinal = req.body.horaFinal;
 
-    var dataInicioSql =
+    var dataInicioSql = new Date(
       dataInicio.split("/")[2] +
-      "-" +
-      dataInicio.split("/")[1] +
-      "-" +
-      dataInicio.split("/")[0] +
-      " " +
-      horaInicio;
-    var dataFinalSql =
+        "-" +
+        dataInicio.split("/")[1] +
+        "-" +
+        dataInicio.split("/")[0] +
+        " " +
+        horaInicio
+    );
+    var dataFinalSql = new Date(
       dataFinal.split("/")[2] +
-      "-" +
-      dataFinal.split("/")[1] +
-      "-" +
-      dataFinal.split("/")[0] +
-      " " +
-      horaFinal;
+        "-" +
+        dataFinal.split("/")[1] +
+        "-" +
+        dataFinal.split("/")[0] +
+        " " +
+        horaFinal
+    );
 
     try {
       response = await Gprmc.findAll({
