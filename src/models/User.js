@@ -16,7 +16,8 @@ const User = db.sequelize.define(
     id_admin: { type: db.Sequelize.INTEGER }
   },
   {
-    freezeTableName: true
+    freezeTableName: true,
+    updatedAt: false,
   }
 );
 User.removeAttribute("createdAt");

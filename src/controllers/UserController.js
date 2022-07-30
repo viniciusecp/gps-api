@@ -181,5 +181,35 @@ module.exports = {
 
     const dadosFinais = convertCoordinates(response);
     return res.json(dadosFinais);
+  },
+
+  async changePassword(req, res) {    
+    const { email, senha: password, novaSenha: newPassword} = req.query;
+
+    if (!email || !password || !newPassword) {
+      return res.send("Requisição imcompleta");
+    }
+
+    var response = await userAuthentication(email, password);
+    if (response.length <= 0) {
+      return res.send("Usúario não autenticado");
+    }
+    
+    try {
+      const passwordHash = crypto
+        .createHash("md5")
+        .update(newPassword)
+        .digest("hex");
+
+      await User.update(
+        { senha: passwordHash },
+        { where: { email } }
+      );
+
+      return res.send("Sucesso");
+    } catch (err) {
+      console.log("Erro: " + err);
+      return res.send(err);
+    }
   }
 };
