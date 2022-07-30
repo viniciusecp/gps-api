@@ -31,8 +31,8 @@ function convertCoordinates(dados) {
   dados.forEach(data => {
     var { date, latitudeDecimalDegrees, longitudeDecimalDegrees, speed } = data;
 
-    date = new Date(date.getTime() - (360 - date.getTimezoneOffset()) * 60000); // GAMBIARRA
-    // date = new Date(date.getTime() - 360 * 60000); // CLOUD
+    // date = new Date(date.getTime() - (360 - date.getTimezoneOffset()) * 60000); // GAMBIARRA
+    date = new Date(date.getTime() - 360 * 60000); // CLOUD
 
     // latitude
     // if (latitudeDecimalDegrees.length == 9)
