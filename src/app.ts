@@ -1,0 +1,56 @@
+import fastify from "fastify";
+import type {
+	FastifyReply,
+	FastifyRequest,
+} from "fastify";
+import fjwt from "@fastify/jwt";
+import authRoutes from "./routes/auth";
+import gprmcRoutes from "./routes/coordinates";
+import vehiclesRoutes from "./routes/vehicles";
+import { AuthService } from "./services/auth-service";
+import { GpsService } from "./services/gps-service";
+import { BemService } from "./services/bem-service";
+import { registerErrorHandler } from "./middleware/errorHandler";
+import { AppError } from "./errors/AppError";
+
+declare module "fastify" {
+	interface FastifyInstance {
+		authenticate: (
+			request: FastifyRequest,
+			reply: FastifyReply,
+		) => Promise<void>;
+		authService: AuthService;
+		gpsService: GpsService;
+		bemService: BemService;
+	}
+}
+
+export async function buildApp() {
+	const app = fastify({ logger: true });
+
+	app.register(fjwt, {
+		secret: process.env.JWT_SECRET || "supersecretjwtkeychangemeinprod",
+	});
+
+	const authService = new AuthService();
+	const gpsService = new GpsService();
+	const bemService = new BemService();
+
+	app.decorate("authenticate", async (request: FastifyRequest, _reply: FastifyReply) => {
+		try {
+			await request.jwtVerify();
+		} catch (_err) {
+			throw new AppError("Token inválido ou expirado", 401);
+		}
+	});
+	app.decorate("authService", authService);
+	app.decorate("gpsService", gpsService);
+	app.decorate("bemService", bemService);
+
+	app.register(authRoutes, { prefix: "/api" });
+	app.register(gprmcRoutes, { prefix: "/api" });
+	app.register(vehiclesRoutes, { prefix: "/api" });
+
+	await registerErrorHandler(app);
+	return app;
+}
